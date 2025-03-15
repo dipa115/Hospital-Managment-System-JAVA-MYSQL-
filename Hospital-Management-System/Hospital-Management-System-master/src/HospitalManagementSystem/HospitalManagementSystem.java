@@ -21,11 +21,18 @@ public class HospitalManagementSystem {
 
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             login loginn = new login(connection, scanner);
-            // Authentication before accessing the system
-            boolean isAuthenticated = false;
-            while (!isAuthenticated) {
+             String userRole = null;
+            while (userRole==null) {
                 System.out.println("\n===== HOSPITAL MANAGEMENT SYSTEM LOGIN =====");
-                isAuthenticated = loginn.authenticate();
+                userRole = loginn.authenticate();
+            }
+
+            if (userRole.equals("admin")) {
+                System.out.println("Welcome, Admin! You have full access.");
+            } else if (userRole.equals("doctor")) {
+                System.out.println("Welcome, Doctor! You can manage patients.");
+            } else if (userRole.equals("staff")) {
+                System.out.println("Welcome, Staff! You can schedule appointments.");
             }
             Patient patient = new Patient(connection, scanner);
             Doctor doctor = new Doctor(connection);
