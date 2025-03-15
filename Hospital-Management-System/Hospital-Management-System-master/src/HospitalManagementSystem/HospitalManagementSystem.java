@@ -20,6 +20,13 @@ public class HospitalManagementSystem {
         Scanner scanner = new Scanner(System.in);
 
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
+            login loginn = new login(connection, scanner);
+            // Authentication before accessing the system
+            boolean isAuthenticated = false;
+            while (!isAuthenticated) {
+                System.out.println("\n===== HOSPITAL MANAGEMENT SYSTEM LOGIN =====");
+                isAuthenticated = loginn.authenticate();
+            }
             Patient patient = new Patient(connection, scanner);
             Doctor doctor = new Doctor(connection);
             Billing billing = new Billing(connection, scanner);
