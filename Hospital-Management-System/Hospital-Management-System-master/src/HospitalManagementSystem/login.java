@@ -12,32 +12,32 @@ public class login {
         this.scanner = scanner;
     }
 
-    public boolean authenticate() {
+    public String authenticate() {
         System.out.print("Enter Username: ");
         String username = scanner.next();
+    
         System.out.print("Enter Password: ");
         String password = scanner.next();
-
-        String query = "SELECT role FROM users WHERE username = ? AND password = ?";
+    
+        // Convert both input and stored usernames to lowercase for case-insensitive comparison
+        String query = "SELECT role FROM users WHERE LOWER(username) = LOWER(?) AND BINARY password = ?";
         
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password); // In real applications, use password hashing
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                String role = resultSet.getString("role");
-                System.out.println("Login Successful! Role: " + role);
-                return true;
-            } else {
-                System.out.println("Invalid Credentials. Please try again!");
-                return false;
+            preparedStatement.setString(2, password); // Since passwords are stored in plaintext
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("role"); // Return user role
+                } else {
+                    System.out.println(" Invalid Credentials! Try Again.");
+                    return null;
+                }
             }
         } catch (SQLException e) {
+            System.out.println(" Database Error During Login!");
             e.printStackTrace();
-            return false;
         }
+        return null;
     }
-}
+}    
